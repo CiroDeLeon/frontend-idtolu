@@ -30,5 +30,23 @@ export default {
           'Authorization': x
         },
       });
+  },
+  onlyForAdmin(credentials,token) {
+    var x="Bearer "+token;
+    return axios.post(`${BASE_URL}auth/only-for-admin`, credentials, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': x
+        },
+      });
+  },
+  onlyForUser(credentials,token) {
+    var x="Bearer "+token;
+    return axios.post(`${BASE_URL}auth/only-for-user`, credentials, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': x
+        },
+      });
   }
 };

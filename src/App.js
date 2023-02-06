@@ -10,10 +10,14 @@ import Footer from './components/Footer';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formType, setFormType] = useState('login');
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ username: '', password: '',role:'' });
   
   const handleResetPassword = async (event) => {
     event.preventDefault();
+    const responseRol=await api.getRoleByUsername(credentials.username);
+    console.log(responseRol.data);
+    credentials.role=responseRol.data;
+    console.log(credentials);
     try {
       const response = await api.resetPassword(credentials,localStorage.getItem('token'));
       if(response.status==200){
@@ -25,6 +29,7 @@ function App() {
       console.error(error);
       alert(error.response.data);
     }
+    credentials.role='';
   };
 
   const handleLogin = async (event) => {
@@ -32,11 +37,12 @@ function App() {
     const responseRol=await api.getRoleByUsername(credentials.username);
     console.log(responseRol);
     if(responseRol.data!=null && responseRol.data!=''){
-      setCredentials({ ...credentials, role: responseRol.data });
+      credentials.role=responseRol.data;
     
 
     try {
       const response = await api.login(credentials);
+      
       localStorage.setItem('token', response.data.token);
       console.log(response);
       credentials.password='';
@@ -49,6 +55,7 @@ function App() {
         alert(error.response.data);
       }
     }
+    credentials.role='';
   }else{
     alert('este usuario no existe');
   }
@@ -56,9 +63,10 @@ function App() {
 
   const handleSignup = async (event) => {
     event.preventDefault();
-    setCredentials({ ...credentials, role: 'USER' });
+    credentials.role='USER'
     try {
       const response = await api.signup(credentials);
+      
       if(response.status==200){
          alert("registrado con exito");
       }
@@ -68,12 +76,54 @@ function App() {
       console.error(error); 
       alert(error.response.data);     
     }
+    credentials.role='';
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     localStorage.removeItem('token');
     setCredentials({ ...credentials, password: '' });
+  };
+
+  const handleOnlyForUser = async (event) => {
+    event.preventDefault();
+    const responseRol=await api.getRoleByUsername(credentials.username);
+    console.log(responseRol.data);
+    credentials.role=responseRol.data;
+    console.log(credentials);
+    try {
+      const response = await api.onlyForUser(credentials,localStorage.getItem('token'));
+      credentials.role='';
+      if(response.status==200){
+         alert("Se obtuvo con exito el mensaje que solo puede ver role USER \n "+response.data);
+      }
+      console.log(response);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error(error);
+      alert(error.response.data);
+    }
+  };
+
+  const handleOnlyForAdmin = async (event) => {
+    event.preventDefault();
+    const responseRol=await api.getRoleByUsername(credentials.username);
+    console.log(responseRol.data);
+    credentials.role=responseRol.data;
+    console.log(credentials);
+    try {
+      const response = await api.onlyForAdmin(credentials,localStorage.getItem('token'));
+      
+      if(response.status==200){
+         alert("Se obtuvo con exito el mensaje que solo puede ver role ADMIN \n"+response.data);
+      }
+      console.log(response);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error(error);
+      alert(error.response.data);
+    }
+    credentials.role='';
   };
 
   return (
@@ -83,6 +133,10 @@ function App() {
       {isLoggedIn ? (
         <>
           <h2>Bienvenido a la aplicación</h2>
+          <h5>estos botones funcionaran dependiendo tu role</h5>
+          <button onClick={handleOnlyForUser}>USER</button>
+          <button onClick={handleOnlyForAdmin}>ADMIN</button>
+          <br /><br /><br />
           <form onSubmit={handleResetPassword}>
               <label htmlFor="username">Nombre de usuario</label>
               <input
