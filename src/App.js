@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formType, setFormType] = useState('login');
-  const [credentials, setCredentials] = useState({ username: '', password: ''});
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
   
   const handleResetPassword = async (event) => {
     event.preventDefault();
@@ -29,11 +29,6 @@ function App() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const responseRol=await api.getRoleByUsername(credentials.username);
-    console.log(responseRol);
-    if(responseRol.data!=null){
-      setCredentials({ ...credentials, role: responseRol.data });
-    }
     try {
       const response = await api.login(credentials);
       localStorage.setItem('token', response.data.token);
@@ -52,11 +47,7 @@ function App() {
 
   const handleSignup = async (event) => {
     event.preventDefault();
- 
-      
-      setCredentials({ ...credentials, role: 'USER' });
-   
-    try {     
+    try {
       const response = await api.signup(credentials);
       if(response.status==200){
          alert("registrado con exito");
@@ -71,7 +62,6 @@ function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem('token');
     credentials.password='';
   };
 
