@@ -11,6 +11,10 @@ export default {
         },
       });
   },
+  getRoleByUsername(userName) {
+
+    return axios.post(`${BASE_URL}auth/roleByUsername/username/${userName}`);
+  },
   signup(credentials) {
     return axios.post(`${BASE_URL}auth/signup`, credentials, {
         headers: {

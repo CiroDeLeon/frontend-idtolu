@@ -29,6 +29,12 @@ function App() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    const responseRol=await api.getRoleByUsername(credentials.username);
+    console.log(responseRol);
+    if(responseRol.data!=null && responseRol.data!=''){
+      setCredentials({ ...credentials, role: responseRol.data });
+    
+
     try {
       const response = await api.login(credentials);
       localStorage.setItem('token', response.data.token);
@@ -43,10 +49,14 @@ function App() {
         alert(error.response.data);
       }
     }
+  }else{
+    alert('este usuario no existe');
+  }
   };
 
   const handleSignup = async (event) => {
     event.preventDefault();
+    setCredentials({ ...credentials, role: 'USER' });
     try {
       const response = await api.signup(credentials);
       if(response.status==200){
@@ -62,7 +72,8 @@ function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    credentials.password='';
+    localStorage.removeItem('token');
+    setCredentials({ ...credentials, password: '' });
   };
 
   return (
